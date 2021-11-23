@@ -80,6 +80,10 @@ class MyPromise {
     const result = []
     let count = 0
     return new MyPromise((resolve, reject) => {
+      if (!(promises instanceof Array)) {
+        reject(new TypeError('参数需要是一个数组'))
+      }
+
       const handlePromiseResult = (index, value) => {
         result[index] = value
         count++
@@ -98,6 +102,27 @@ class MyPromise {
       });
     })
   }
+
+  /**
+   * race 方法
+   * @param {Array} promises 
+   * 接收一个 promise 数组，如果有非 promise 项，则此项当作成功
+   * 哪个 promise 最快得到结果，就返回哪个结果，无论成功或失败
+   */
+  static race (promises) {
+    return new MyPromise((resolve, reject) => {
+      if (!(promises instanceof Array)) {
+        reject(new TypeError('参数需要是一个数组'))
+      }
+      promises.forEach(promise => {
+        if (promise instanceof MyPromise) {
+          promise.then(res => resolve(res), err => reject(err))
+        } else {
+          resolve(promise)
+        }
+      })
+    })
+  }
 }
 
 // const test1 = new MyPromise((resolve, reject) => {
@@ -110,9 +135,9 @@ class MyPromise {
 // }).then(res => console.log(res), err => console.log('err', err))
 // console.log('--', test1)
 
-const p = new MyPromise((resolve, reject) => {
-  resolve(100)
-}).then(res => 2 * res).then(res => console.log('3:', res))
+// const p = new MyPromise((resolve, reject) => {
+//   resolve(100)
+// }).then(res => 2 * res).then(res => console.log('3:', res))
 // const p2 = new MyPromise((resolve, reject) => {
 //   resolve(100)
 // }).then(res => new MyPromise((resolve, reject) => resolve(3 * res)))
@@ -126,10 +151,10 @@ const p = new MyPromise((resolve, reject) => {
  * 3. 返回非 promise 对象，结果就是一个成功的 promise 对象
  */
 
-const p3 = new MyPromise((resolve, reject) => {
-  resolve(1)
-}).then(res => console.log(res), err => console.log(err))
-console.log('last console')
+// const p3 = new MyPromise((resolve, reject) => {
+//   resolve(1)
+// }).then(res => console.log(res), err => console.log(err))
+// console.log('last console')
 
 const p4 = new MyPromise((resolve, reject) => {
   resolve(2)
@@ -138,4 +163,4 @@ const p5 = new MyPromise((resolve, reject) => {
   resolve(3)
 })
 
-MyPromise.all([p5, p4]).then(res => console.log('all:', res))
+MyPromise.race([p5, p4]).then(res => console.log('all:', res), err => console.log(err))
