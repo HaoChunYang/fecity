@@ -75,6 +75,11 @@ class MyPromise {
     return thenPromise
   }
 
+  // catch 方法
+  catch (fn) {
+    return this.then(null, fn)
+  }
+
   // all 方法
   static all (promises) {
     const result = []
@@ -164,3 +169,7 @@ const p5 = new MyPromise((resolve, reject) => {
 })
 
 MyPromise.race([p5, p4]).then(res => console.log('all:', res), err => console.log(err))
+
+const p6 = new MyPromise((resolve, reject) => {
+  reject('err n')
+}).then(res => console.log(res)).catch(err => console.log('catch:', err))
