@@ -74,6 +74,30 @@ class MyPromise {
     })
     return thenPromise
   }
+
+  // all 方法
+  static all (promises) {
+    const result = []
+    let count = 0
+    return new MyPromise((resolve, reject) => {
+      const handlePromiseResult = (index, value) => {
+        result[index] = value
+        count++
+        if (count === promises.length) {
+          resolve(result)
+        }
+      }
+      promises.forEach((promise, index) => {
+        if (promise instanceof MyPromise) {
+          promise.then(res => {
+            handlePromiseResult(index, res)
+          }, err => reject(err))
+        } else {
+          handlePromiseResult(index, promise)
+        }
+      });
+    })
+  }
 }
 
 // const test1 = new MyPromise((resolve, reject) => {
@@ -106,3 +130,12 @@ const p3 = new MyPromise((resolve, reject) => {
   resolve(1)
 }).then(res => console.log(res), err => console.log(err))
 console.log('last console')
+
+const p4 = new MyPromise((resolve, reject) => {
+  resolve(2)
+})
+const p5 = new MyPromise((resolve, reject) => {
+  resolve(3)
+})
+
+MyPromise.all([p5, p4]).then(res => console.log('all:', res))
