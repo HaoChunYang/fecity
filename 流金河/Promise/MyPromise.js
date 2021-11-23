@@ -45,19 +45,21 @@ class MyPromise {
     console.log('then~', this.PromiseState)
     var thenPromise = new MyPromise((resolve, reject) => {
       const resolvePromise = cb => {
-        try {
-          const x = cb(this.PromiseResult)
-          if (x === thenPromise) {
-            throw new Error('不能返回自身')
+        setTimeout(() => {
+          try {
+            const x = cb(this.PromiseResult)
+            if (x === thenPromise) {
+              throw new Error('不能返回自身')
+            }
+            if (x instanceof MyPromise) {
+              x.then(resolve, reject)
+            } else {
+              resolve(x)
+            }
+          } catch (e) {
+            reject(e)
           }
-          if (x instanceof MyPromise) {
-            x.then(resolve, reject)
-          } else {
-            resolve(x)
-          }
-        } catch (e) {
-          reject(e)
-        }
+        })
       }
       if (this.PromiseState === 'fulfilled') {
         resolvePromise(onFulfilled)
@@ -99,3 +101,8 @@ const p = new MyPromise((resolve, reject) => {
  *    返回失败，新 promise 就是失败
  * 3. 返回非 promise 对象，结果就是一个成功的 promise 对象
  */
+
+const p3 = new MyPromise((resolve, reject) => {
+  resolve(1)
+}).then(res => console.log(res), err => console.log(err))
+console.log('last console')
