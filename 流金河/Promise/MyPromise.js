@@ -4,7 +4,7 @@ class MyPromise {
     this.initBind()
     try {
       executor(this.resolve, this.reject)
-      console.log('promise over!')
+      // console.log('promise over!')
     } catch (e) {
       this.reject(e)
     }
@@ -20,7 +20,7 @@ class MyPromise {
     this.onRejectedCallbacks = []
   }
   resolve (value) {
-    console.log('p resolve', value)
+    // console.log('p resolve', value)
     if (this.PromiseState !== 'pending') return
     this.PromiseState = 'fulfilled'
     this.PromiseResult = value
@@ -42,7 +42,7 @@ class MyPromise {
     onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : val => val
     onRejected = typeof onRejected === 'function' ? onRejected : reason => { throw reason }
 
-    console.log('then~', this.PromiseState)
+    // console.log('then~', this.PromiseState)
     var thenPromise = new MyPromise((resolve, reject) => {
       const resolvePromise = cb => {
         setTimeout(() => {
@@ -185,6 +185,33 @@ class MyPromise {
       })
     })
   }
+
+  /**
+   * resolve 方法
+   * 返回一个以给定值解析后的 Promise 对象
+   * 如果参数是 promise ，则直接返回
+   * @param {*} value 
+   */
+  static resolve (value) {
+    if (value instanceof MyPromise) {
+      return value
+    } else {
+      return new MyPromise((resolve, reject) => {
+        resolve(value)
+      })
+    }
+  }
+
+  /**
+   * reject 方法
+   * 返回一个带有拒绝原因的 Promise 对象
+   * @param {*} reason 
+   */
+  static reject (reason) {
+    return new MyPromise((resolve, reject) => {
+      reject(reason)
+    })
+  }
 }
 
 
@@ -237,13 +264,38 @@ class MyPromise {
 // ------------------
 // MyPromise.allSettled([p4, p5]).then(res => console.log(res))
 
-const p6 = new MyPromise((resolve, reject) => {
-  reject(1)
-})
-const p7 = new MyPromise((resolve, reject) => {
-  reject(2)
-})
-const p8 = new MyPromise((resolve, reject) => {
-  reject(3)
-})
-MyPromise.any([p6, p7, p8]).then(res => console.log(res), err => console.log(err))
+// const p6 = new MyPromise((resolve, reject) => {
+//   reject(1)
+// })
+// const p7 = new MyPromise((resolve, reject) => {
+//   reject(2)
+// })
+// const p8 = new MyPromise((resolve, reject) => {
+//   reject(3)
+// })
+// MyPromise.any([p6, p7, p8]).then(res => console.log(res), err => console.log(err))
+
+// -----------------------
+MyPromise.resolve("Success").then(function (value) {
+  console.log(value); // "Success"
+}, function (value) {
+  // 不会被调用
+});
+
+var p = MyPromise.resolve([1, 2, 3]);
+p.then(function (v) {
+  console.log(v[0]); // 1
+});
+
+var original = MyPromise.resolve(33);
+var cast = MyPromise.resolve(original);
+cast.then(function (value) {
+  console.log('value: ' + value);
+});
+console.log('original === cast ? ' + (original === cast));
+
+MyPromise.reject(new Error('fail')).then(function () {
+  // not called
+}, function (error) {
+  console.error(error); // Stacktrace
+});
