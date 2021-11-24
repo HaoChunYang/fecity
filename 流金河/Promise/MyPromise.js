@@ -128,8 +128,41 @@ class MyPromise {
       })
     })
   }
+
+  /**
+   * allSettled 方法
+   * 接收一个 promise 数组，返回每一个 Promise 的结果数组集合。
+   * 其中非 Promise 项，作为成功项。
+   * @param {*} promises 
+   */
+  static allSettled (promises) {
+    return new MyPromise((resolve, reject) => {
+      const result = []
+      let count = 0
+      const handlePromiseResult = (status, value, i) => {
+        result[i] = {
+          status,
+          value
+        }
+        count++
+        if (count === promises.length) {
+          resolve(result)
+        }
+      }
+      promises.forEach((promise, i) => {
+        if (promise instanceof MyPromise) {
+          promise.then(res => handlePromiseResult('fulfilled', res, i),
+            err => handlePromiseResult('rejected', err, i))
+        } else {
+          handlePromiseResult('rejected', promise, i)
+        }
+      })
+    })
+  }
 }
 
+
+// ------------测试、验证 代码---------------
 // const test1 = new MyPromise((resolve, reject) => {
 //   // throw ('eee')
 //   // resolve('en')
@@ -161,15 +194,19 @@ class MyPromise {
 // }).then(res => console.log(res), err => console.log(err))
 // console.log('last console')
 
+// ------------------
 const p4 = new MyPromise((resolve, reject) => {
   resolve(2)
 })
 const p5 = new MyPromise((resolve, reject) => {
-  resolve(3)
+  reject(3)
 })
 
-MyPromise.race([p5, p4]).then(res => console.log('all:', res), err => console.log(err))
+// MyPromise.race([p5, p4]).then(res => console.log('all:', res), err => console.log(err))
 
-const p6 = new MyPromise((resolve, reject) => {
-  reject('err n')
-}).then(res => console.log(res)).catch(err => console.log('catch:', err))
+// const p6 = new MyPromise((resolve, reject) => {
+//   reject('err n')
+// }).then(res => console.log(res)).catch(err => console.log('catch:', err))
+
+// ------------------
+MyPromise.allSettled([p4, p5]).then(res => console.log(res))
