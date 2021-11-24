@@ -159,6 +159,32 @@ class MyPromise {
       })
     })
   }
+
+  /**
+   * any 方法（当前处于 TC39 第四阶段草案（Stage 4））
+   * 接收 promise 数组，如果有成功则返回成功结果，如果都失败，则报错。其中非 Promise 项，当作成功项。
+   * @param {*} promises 
+   */
+  static any (promises) {
+    let count = 0
+    return new MyPromise((resolve, reject) => {
+      promises.forEach((promise) => {
+        if (promise instanceof MyPromise) {
+          promise.then(res => {
+            resolve(res)
+          }, err => {
+            count++
+            if (count === promises.length) {
+              console.log('所有的 promise 都失败了')
+              reject(new AggregateError('所有的 promise 都失败了'))
+            }
+          })
+        } else {
+          resolve(promise)
+        }
+      })
+    })
+  }
 }
 
 
@@ -195,12 +221,12 @@ class MyPromise {
 // console.log('last console')
 
 // ------------------
-const p4 = new MyPromise((resolve, reject) => {
-  resolve(2)
-})
-const p5 = new MyPromise((resolve, reject) => {
-  reject(3)
-})
+// const p4 = new MyPromise((resolve, reject) => {
+//   resolve(2)
+// })
+// const p5 = new MyPromise((resolve, reject) => {
+//   reject(3)
+// })
 
 // MyPromise.race([p5, p4]).then(res => console.log('all:', res), err => console.log(err))
 
@@ -209,4 +235,15 @@ const p5 = new MyPromise((resolve, reject) => {
 // }).then(res => console.log(res)).catch(err => console.log('catch:', err))
 
 // ------------------
-MyPromise.allSettled([p4, p5]).then(res => console.log(res))
+// MyPromise.allSettled([p4, p5]).then(res => console.log(res))
+
+const p6 = new MyPromise((resolve, reject) => {
+  reject(1)
+})
+const p7 = new MyPromise((resolve, reject) => {
+  reject(2)
+})
+const p8 = new MyPromise((resolve, reject) => {
+  reject(3)
+})
+MyPromise.any([p6, p7, p8]).then(res => console.log(res), err => console.log(err))
