@@ -7,3 +7,5 @@
 [SVG 的官方文档](https://developer.mozilla.org/zh-CN/docs/Web/SVG)
 
 [WebGL API 的官方文档](https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL_API)
+
+d3 转换数据工具库 [d3-hierarchy](https://github.com/d3/d3-hierarchy)
