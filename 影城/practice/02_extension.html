@@ -1,0 +1,61 @@
+<canvas width="300" height="300"></canvas>
+<canvas width="300" height="300"></canvas>
+<canvas width="300" height="300"></canvas>
+
+<style>
+  canvas {
+    width: 150px;
+    height: 150px;
+    border: 1px solid #999;
+  }
+</style>
+<script>
+  // 绘制 五角星
+  {
+    const canvas = document.querySelectorAll('canvas')[2]
+    const context = canvas.getContext('2d')
+  
+    context.fillStyle = '#a95'
+    context.beginPath()
+    context.moveTo(150, 100)
+    context.lineTo(200, 200)
+    context.lineTo(80, 130)
+    context.lineTo(220, 130)
+    context.lineTo(100, 200)
+    context.lineTo(150, 100)
+    context.fill()
+  }
+</script>
+<script>
+  // 绘制椭圆
+  /**
+   * ellipse(椭圆圆心x坐标，椭圆圆心y坐标，长轴半径，短轴半径，椭圆旋转角度，起始点角度，终点角度，{boolean}画圆方向(可选))
+   * 其中角度为：孤度表示，不是角度度数。Math.PI
+   * 角度，从 x 正半轴开始，顺时针旋转。从 0 到 2 PI 度数。
+   */
+  {
+    const canvas = document.querySelectorAll('canvas')[1]
+    const context = canvas.getContext('2d')
+  
+    context.fillStyle = '#3fa'
+    context.beginPath()
+    context.ellipse(150, 150, 100, 50, 0, 0, Math.PI * 2)
+    context.fill()
+  }
+</script>
+<script>
+  // 绘制三角形
+function drawTriangle() {
+  const canvas = document.querySelectorAll('canvas')[0]
+  const context = canvas.getContext('2d')
+
+  context.fillStyle = '#f50'
+  context.beginPath()
+
+  context.moveTo(150, 100)
+  context.lineTo(200, 200)
+  context.lineTo(100, 200)
+  context.fill()
+}
+drawTriangle()
+</script>
