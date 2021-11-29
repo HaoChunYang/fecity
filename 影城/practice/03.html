@@ -1,0 +1,92 @@
+<h1 id="title"></h1>
+<svg width="800" height="800" viewBox="0 0 1600 1600"></svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <circle cx="100" cy="50" r="40" stroke="black"
+  stroke-width="2" fill="orange" />
+</svg>
+
+<style>
+  #title {
+    position: absolute;
+    width: 800px;
+    text-align: center;
+  }
+</style>
+<script src="https://d3js.org/d3-hierarchy.v1.min.js"></script>
+<script>
+  const svgroot = document.querySelector('svg')
+  function draw(parent, node, {fillStyle = 'rgba(0, 0, 0, 0.2)', textColor = 'white'} = {}) {
+    const {x, y, r} = node
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+    circle.setAttribute('cx', x)
+    circle.setAttribute('cy', y)
+    circle.setAttribute('r', r)
+    circle.setAttribute('fill', fillStyle)
+    circle.setAttribute('data-name', node.data.name)
+    parent.appendChild(circle)
+    if (node.children) {
+      // 绘制 子节点
+      const group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+      for (let i = 0; i < node.children.length; i++) {
+        draw(group, node.children[i])
+      }
+      group.setAttribute('data-name', node.data.name)
+      parent.appendChild(group)
+    } else {
+      // 绘制 文本
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+      text.setAttribute('fill', textColor)
+      text.setAttribute('font-family', 'Arial')
+      text.setAttribute('font-size', '1.5rem')
+      text.setAttribute('text-anchor', 'middle')
+      text.setAttribute('x', x)
+      text.setAttribute('y', y)
+      const name = node.data.name
+      text.setAttribute('data-name', name)
+      text.textContent = name
+      parent.appendChild(text)
+    }
+  }
+
+  (async function () {
+    const dataSource = 'https://s5.ssl.qhres2.com/static/b0695e2dd30daa64.json'
+  
+    const data = await (await fetch(dataSource)).json()
+    console.log(data)
+    // d3 处理数据
+    const regions = d3.hierarchy(data).sum(d => 1).sort((a, b) => b.value - a.value)
+
+    const pack = d3.pack().size([1600, 1600]).padding(3)
+
+    const root = pack(regions)
+    
+    console.log('root', root)
+    draw(svgroot, root)
+  })()
+
+  let activeTarget = null
+  const titleEl = document.getElementById('title')
+  function getTitle(target) {
+    console.log(target)
+    const name = target.getAttribute('data-name')
+    if (target.parentNode && target.parentNode.nodeName === 'g') {
+      const parentName = target.parentNode.getAttribute('data-name')
+      return `${parentName}-${name}`
+    }
+    return name
+  }
+  svgroot.addEventListener('mousemove', (evt) => {
+    let target = evt.target
+    if (target.nodeName === 'text') {
+      // target = target.parentNode
+      target = target.previousSibling
+    }
+    if (activeTarget && activeTarget !== target) {
+      activeTarget.setAttribute('fill', 'rgba(0, 0, 0, 0.2)')
+    }
+    target.setAttribute('fill', 'rgba(0, 128, 0, 0.1)')
+    titleEl.textContent = getTitle(target)
+    activeTarget = target
+  })
+
+</script>
