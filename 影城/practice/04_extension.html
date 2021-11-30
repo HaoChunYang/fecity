@@ -1,6 +1,55 @@
 <canvas width="100" height="100"></canvas>
 
 <script>
+  // a. 先封装一个生成多边形顶点坐标数组的函数
+  function createPolygonVertex(x, y, r, n) {
+    const sin = Math.sin;
+    const cos = Math.cos;
+    const perAngel = (2 * Math.PI) / n;
+    const positionArray = [];
+    for (let i = 0; i < n; i++) {
+      const angel = i * perAngel;
+      const nx = x + r * cos(angel);
+      const ny = y + r * sin(angel);
+      positionArray.push(nx, ny);
+    }
+    return new Float32Array(positionArray);
+  }
+  // b. 封装一个生成正多角星顶点的数组函数
+  function createStarVertex(x, y, r, R, n) {
+    const sin = Math.sin;
+    const cos = Math.cos;
+    const perAngel = Math.PI / n;
+    const positionArray = [];
+    for (let i = 0; i < 2 * n; i++) {
+      const angel = i * perAngel;
+      if (i % 2 !== 0) {
+        const Rx = x + R * cos(angel);
+        const Ry = y + R * sin(angel);
+        positionArray.push(Rx, Ry);
+      } else {
+        const rx = x + r * cos(angel);
+        const ry = y + r * sin(angel);
+        positionArray.push(rx, ry);
+      }
+    }
+    return new Float32Array(positionArray);
+  }
+
+  function getPolygonPoints(n, r) {
+      const stepAngle = 2 * Math.PI / n
+      let initAngle = 0
+      const pointArray = []
+      for(let i = 0; i < n; i++) {
+        // 存储x坐标
+        pointArray.push(r * Math.cos(initAngle))
+        // 存储y坐标
+        pointArray.push(r * Math.sin(initAngle))
+
+        initAngle += stepAngle
+      }
+      return pointArray
+    }
   // 1. 创建 webgl 上下文
   const canvas = document.querySelector('canvas')
   const gl = canvas.getContext('webgl')
@@ -53,11 +102,15 @@
 
   // 3. 将数据存入缓冲区
   // 定义三角形的三个定点
-  const points = new Float32Array([
+  let points = new Float32Array([
     -1, -1,
     0, 1,
     1, -1
   ])
+  points = createPolygonVertex(0, 0, 0.5, 4)
+  points = createPolygonVertex(0, 0, 1, 5)
+  points = createStarVertex(0, 0, 0.3, 0.6, 6)
+  points = new Float32Array(getPolygonPoints(4, 1))
   // 将定义好的数据写入缓冲区 createBuffer、bindBuffer、bufferData
   const bufferId = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferId)
@@ -75,14 +128,7 @@
   // 将当前画布的内容清除
   gl.clear(gl.COLOR_BUFFER_BIT)
   // 传入绘制模式 gl.TRIANGLES 表示以三角形为图元进行绘制; 0 顶点偏移量; points.length / 2 顶点数量
-  gl.drawArrays(gl.TRIANGLES, 0, points.length / 2)
+  // gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length / 2) // 实心
+  gl.drawArrays(gl.LINE_LOOP, 0, points.length / 2) // 空心
 
-  /**
-    04.html:48 WebGL: INVALID_OPERATION: useProgram: program not valid
-    (anonymous) @ 04.html:48
-    04.html:64 WebGL: INVALID_OPERATION: getAttribLocation: program not linked
-    (anonymous) @ 04.html:64
-    04.html:74 WebGL: INVALID_OPERATION: drawArrays: no valid shader program in use
-    (anonymous) @ 04.html:74
-   */
 </script>

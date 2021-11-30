@@ -96,6 +96,13 @@ const points = new Float32Array([
 
 ![WebGL 绘图流程](./../img/WebGL绘图流程.webp)
 
+- WebGL 支持的图元类型：
+  webgl 支持的图元类型有七种，分别是 gl.POINTS(点), gl.LINES(线段), gl.LINE_STRIP(线条), gl.LINE_LOOP(回路), gl.TRIANGLES(三角形), gl.TRIANGLE_STRIP(三角带), gl.TRIANGLE_FAN(三角扇)
+
+## 绘制正四边形、正五边形、正六角星
+
+[参考代码](./../practice/04_extension.html)
+
 ---
 
 ### 尬记：
