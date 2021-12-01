@@ -1,0 +1,37 @@
+<canvas width="512" height="256"></canvas>
+<canvas width="512" height="256"></canvas>
+
+<script src="https://unpkg.com/roughjs@latest/bundled/rough.js"></script>
+<script>
+  // 未转换坐标系时，坐标点的计算
+const rc = rough.canvas(document.querySelectorAll('canvas')[0]);
+const hillOpts = {roughness: 2.8, strokeWidth: 2, fill: 'blue'};
+rc.path('M76 256L176 156L276 256', hillOpts);
+rc.path('M236 256L336 156L436 256', hillOpts);
+rc.circle(256, 106, 105, {
+  stroke: 'red',
+  strokeWidth: 4,
+  fill: 'rgba(255, 255, 0, 0.4)',
+  fillStyle: 'solid',
+});
+</script>
+<script>
+{
+  // 转换坐标系后，坐标点的计算，变得相对简单。
+  const rc = rough.canvas(document.querySelectorAll('canvas')[1]);
+
+  const ctx = rc.ctx;
+  ctx.translate(256, 256) // 坐标原点从左上角的 (0, 0) 移动到 (256, 256) 的位置。相对于画布就是底边的中点
+  ctx.scale(1, -1) // 将 y 轴向下的部分，通过 x 轴翻转 180 度，y 轴正向朝上
+
+  const hillOpts = {roughness: 2.8, strokeWidth: 2, fill: 'blue'};
+  rc.path('M-180 0L-80 100L20 0', hillOpts);
+  rc.path('M-20 0L80 100L180 0', hillOpts);
+  rc.circle(0, 150, 105, {
+    stroke: 'red',
+    strokeWidth: 4,
+    fill: 'rgba(255, 255, 0, 0.4)',
+    fillStyle: 'solid',
+  });
+}
+</script>
