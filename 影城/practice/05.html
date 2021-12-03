@@ -1,5 +1,6 @@
 <canvas width="512" height="256"></canvas>
 <canvas width="512" height="256"></canvas>
+<canvas width="600" height="600"></canvas>
 
 <script src="https://unpkg.com/roughjs@latest/bundled/rough.js"></script>
 <script>
@@ -33,5 +34,108 @@ rc.circle(256, 106, 105, {
     fill: 'rgba(255, 255, 0, 0.4)',
     fillStyle: 'solid',
   });
+}
+</script>
+<script type="module">
+{
+  class Vector2D extends Array {
+    constructor (x = 1, y = 0) {
+      // this = [x, y]
+      super(x, y)
+    }
+    set x(v) {
+      this[0] = v;
+    }
+
+    set y(v) {
+      this[1] = v;
+    }
+
+    get x() {
+      return this[0];
+    }
+
+    get y() {
+      return this[1];
+    }
+
+    copy() {
+      return new Vector2D(this.x, this.y)
+    }
+    add(v) {
+      this.x += v.x
+      this.y += v.y
+      return this
+    }
+    scale(a) {
+      this.x *= a
+      this.y *= a
+      return this
+    }
+    rotate(rad) {
+      const c = Math.cos(rad), s = Math.sin(rad);
+      const [x, y] = this
+      this.x = x * c + y * -s;
+      this.y = x * s + y * c;
+      return this;
+    }
+  }
+
+  const canvas = document.querySelectorAll('canvas')[2]
+  const ctx = canvas.getContext('2d')
+
+  ctx.translate(0, canvas.height)
+  ctx.scale(1, -1)
+  ctx.lineCap = 'round'
+
+  /**
+   * context: canvas2D 上下文
+   * v0 : 起始向量
+   * length: 当前树权的长度
+   * thickness: 是当前树枝的粗细
+   * dir: 当前树权的方向，用与 x 轴的夹角表示，单位是弧度
+   * bias: 随机偏向因子。用来让树枝的朝向有一定的随机性
+   */
+  function drawBranch (context, v0, length, thickness, dir, bias) {
+    const v = new Vector2D(1, 0).rotate(dir).scale(length);
+    const v1 = v0.copy().add(v);
+
+    console.log(v, v0, v1)
+    context.lineWidth = thickness;
+    context.beginPath();
+    context.moveTo(...v0);
+    context.lineTo(...v1);
+    context.stroke();
+
+    // if(thickness > 2) {
+    //   const left = dir + 0.2;
+    //   drawBranch(context, v1, length * 0.9, thickness * 0.8, left, bias * 0.9);
+    //   const right = dir - 0.2;
+    //   drawBranch(context, v1, length * 0.9, thickness * 0.8, right, bias * 0.9);
+    // }
+
+    if(thickness > 2) {
+      const left = Math.PI / 4 + 0.5 * (dir + 0.2) + bias * (Math.random() - 0.5);
+      drawBranch(context, v1, length * 0.9, thickness * 0.8, left, bias * 0.9);
+      const right = Math.PI / 4 + 0.5 * (dir - 0.2) + bias * (Math.random() - 0.5);
+      drawBranch(context, v1, length * 0.9, thickness * 0.8, right, bias * 0.9);
+    }
+
+    if(thickness < 5 && Math.random() < 0.3) {
+      context.save();
+      context.strokeStyle = '#c72c35';
+      const th = Math.random() * 6 + 3;
+      context.lineWidth = th;
+      context.beginPath();
+      context.moveTo(...v1);
+      context.lineTo(v1.x, v1.y - 2);
+      context.stroke();
+      context.restore();
+    }
+  }
+
+  const v0 = new Vector2D(256, 0)
+  
+  drawBranch(ctx, v0, 50, 10, Math.PI / 2, 3)
 }
 </script>
