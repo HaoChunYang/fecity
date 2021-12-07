@@ -36,8 +36,9 @@ rc.circle(256, 106, 105, {
   });
 }
 </script>
-<script type="module">
+<script>
 {
+  // 该部分可提取封装一个简单的库 参见：./common/lib/vector2d.js
   class Vector2D extends Array {
     constructor (x = 1, y = 0) {
       // this = [x, y]

@@ -9,3 +9,13 @@
 [WebGL API 的官方文档](https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL_API)
 
 d3 转换数据工具库 [d3-hierarchy](https://github.com/d3/d3-hierarchy)
+
+[手绘风格库 Rough.js](https://github.com/rough-stuff/rough)
+
+## 基础篇
+
+01 - 04
+
+## 数学篇
+
+05 开始
